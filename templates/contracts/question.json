@@ -1,0 +1,18 @@
+{
+  "id": "DEC-001",
+  "phase": "requirements",
+  "question": "系统的审批规则是什么？",
+  "blocking": true,
+  "options": [
+    {
+      "id": "A",
+      "label": "一级审批（推荐用于简单场景）",
+      "reason": "开发与使用成本较低"
+    },
+    {
+      "id": "B",
+      "label": "二级审批",
+      "reason": "更严格但处理时间更长"
+    }
+  ]
+}

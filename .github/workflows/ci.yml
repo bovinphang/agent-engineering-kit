@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # MVP builds without third-party runtime dependencies. Dependency lock generation
+      # needs live npm access; use npm install until the first publishable lock is committed.
+      - name: Install developer tools
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verify skills, typecheck, build and unit/E2E tests
+        run: npm run check
+      - name: Smoke the CLI
+        run: node bin/ai-engineering.mjs --help
+      - name: Package check
+        run: npm pack --dry-run

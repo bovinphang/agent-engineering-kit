@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI-Native Engineering Project Configuration V1",
+  "type": "object",
+  "required": ["schemaVersion", "projectKind", "riskProfile", "autonomy", "runner", "technologyProfiles", "customRules"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "projectKind": {"enum": ["greenfield", "feature"]},
+    "riskProfile": {"enum": ["basic", "standard", "regulated"]},
+    "autonomy": {"enum": ["L0", "L1", "L2", "L3"]},
+    "runner": {"enum": ["local"]},
+    "technologyProfiles": {"type": "array", "items": {"type": "string"}},
+    "customRules": {"type": "array", "items": {"type": "string"}}
+  }
+}

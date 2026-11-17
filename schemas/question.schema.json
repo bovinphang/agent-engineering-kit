@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Guided Engineering Question V1",
+  "type": "object",
+  "required": ["id", "phase", "question", "blocking", "options"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^DEC-[A-Z0-9-]+$"},
+    "phase": {"enum": ["requirements", "spec", "design", "plan", "implement", "verify", "review", "deliver", "learn"]},
+    "question": {"type": "string", "minLength": 1},
+    "blocking": {"type": "boolean"},
+    "options": {"type": "array", "minItems": 2, "maxItems": 4, "items": {"type": "object", "required": ["id", "label", "reason"], "properties": {"id": {"type": "string", "minLength": 1}, "label": {"type": "string", "minLength": 1}, "reason": {"type": "string", "minLength": 1}}}}
+  }
+}

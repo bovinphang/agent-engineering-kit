@@ -1,0 +1,12 @@
+{
+  "reviewer_id": "independent-agent-or-person",
+  "context_id": "new-context-id",
+  "task_id": "TASK-001",
+  "source": "new-session",
+  "findings": [
+    {
+      "severity": "medium",
+      "status": "closed"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "profile": "web-admin",
+  "description": "React/Vue web admin full-stack business system",
+  "defaultRisk": "standard",
+  "requiredGates": [
+    "requirements",
+    "spec",
+    "design",
+    "plan",
+    "verify",
+    "review",
+    "deliver"
+  ],
+  "approvalRequired": [
+    "destructive-database-change",
+    "protected-branch-merge",
+    "production-deploy"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agent-engineering-kit/task-contract-v1.schema.json",
+  "title": "AI-Native Task Contract V1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "id", "name", "requirements", "acceptance_criteria", "depends_on", "allowed_paths", "verification", "implementer"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^TASK-[A-Za-z0-9-]+$"},
+    "name": {"type": "string", "minLength": 1},
+    "requirements": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^FR-[0-9]{3}$"}},
+    "acceptance_criteria": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^AC-FR-[0-9]{3}-[0-9]{2}$"}},
+    "depends_on": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^TASK-[A-Za-z0-9-]+$"}},
+    "allowed_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "forbidden_paths": {"type": "array", "items": {"type": "string"}},
+    "verification": {"type": "object", "required": ["commands"], "properties": {"commands": {"type": "array", "minItems": 1, "items": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}}},
+    "implementer": {"type": "object", "required": ["id", "context_id"], "properties": {"id": {"type": "string", "minLength": 1}, "context_id": {"type": "string", "minLength": 1}}}
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "profile": "desktop",
+  "description": "Tauri/Electron application",
+  "defaultRisk": "standard",
+  "requiredGates": [
+    "requirements",
+    "spec",
+    "design",
+    "plan",
+    "verify",
+    "review",
+    "deliver"
+  ],
+  "approvalRequired": [
+    "destructive-database-change",
+    "protected-branch-merge",
+    "production-deploy"
+  ]
+}

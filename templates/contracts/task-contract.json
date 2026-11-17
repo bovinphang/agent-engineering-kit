@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "id": "TASK-001",
+  "name": "独立、可验收的任务",
+  "requirements": [
+    "FR-001"
+  ],
+  "acceptance_criteria": [
+    "AC-FR-001-01"
+  ],
+  "depends_on": [],
+  "allowed_paths": [
+    "src/**",
+    "tests/**"
+  ],
+  "forbidden_paths": [
+    ".env*",
+    "secrets/**"
+  ],
+  "verification": {
+    "commands": [
+      [
+        "node",
+        "--test",
+        "tests/feature.test.mjs"
+      ]
+    ]
+  },
+  "implementer": {
+    "id": "implementation-agent",
+    "context_id": "implementation-session"
+  }
+}
