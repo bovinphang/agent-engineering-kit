@@ -4,7 +4,9 @@ import { initProject, startRun, getStatus, resume, advance, addQuestion, recordA
 import { validateContracts } from '../../core/src/validation.js';
 import { installAgent, uninstallAgent, verifyAgentInstallation } from '../../adapters/src/install.js';
 import { readTextOrEmpty } from '../../core/src/io.js';
-const help = `AI-Native Engineering Kit (aek) v0.1.0
+import { detectHost, runAgentStage, runIndependentReview } from '../../agents/src/runtime.js';
+import { driveWorkflow } from '../../agents/src/drive.js';
+const help = `AI-Native Engineering Kit (aek) v0.2.0
 Usage: aek <command> [arguments] [--project <path>]
   init [--kind greenfield|feature] [--risk standard|regulated] [--dry-run]
   install codex|claude|cursor [--dry-run]   Install skills & rules (existing files untouched)
@@ -21,6 +23,13 @@ Usage: aek <command> [arguments] [--project <path>]
   review path/to/review.json               Import attested independent-review result
   approve deliver --actor human            Authorize regulated acceptance gate
   release-ready                           Evaluate delivery readiness (does not deploy)
+  agent-check codex|claude|cursor         Detect an actual installed Agent CLI (--version)
+  agent-stage codex|claude|cursor --allow-agent-exec --allow-writes
+                                          Execute the current stage in the real host CLI; no automatic gate bypass
+  agent-review codex|claude|cursor --allow-agent-exec
+                                          Run independent read-only review in a fresh Git worktree
+  drive --agent codex --reviewer claude --allow-agent-exec --allow-writes --allow-tests [--auto-commit]
+                                          Resume auto-workflow until decision, safety gate, failure or completion
   doctor                                  Show environment and workflow status
 
 Read docs/09-delivery/quickstart.md for full instructions.
@@ -93,13 +102,45 @@ export async function main(args) {
             out(validateContracts(tasks, spec));
             return;
         }
+        case 'agent-check':
+            out(await detectHost(positional[0], { binary: getOption(args, '--binary') }));
+            return;
+        case 'agent-stage': {
+            const result = await runAgentStage(root, positional[0], {
+                allowExec: args.includes('--allow-agent-exec'), allowWrites: args.includes('--allow-writes'),
+                binary: getOption(args, '--binary'), timeoutMs: Number(getOption(args, '--timeout-ms', '180000'))
+            });
+            out(result);
+            if (result.exitCode !== 0)
+                process.exitCode = 1;
+            return;
+        }
+        case 'agent-review': {
+            out(await runIndependentReview(root, positional[0], {
+                allowExec: args.includes('--allow-agent-exec'), binary: getOption(args, '--binary'),
+                timeoutMs: Number(getOption(args, '--timeout-ms', '180000'))
+            }));
+            return;
+        }
+        case 'drive': {
+            const result = await driveWorkflow(root, getOption(args, '--agent', 'codex'), {
+                reviewer: getOption(args, '--reviewer', 'claude'),
+                allowExec: args.includes('--allow-agent-exec'), allowWrites: args.includes('--allow-writes'),
+                allowTests: args.includes('--allow-tests'), autoCommit: args.includes('--auto-commit'),
+                maxStages: Number(getOption(args, '--max-stages', '12')), maxFixAttempts: Number(getOption(args, '--max-fix-attempts', '2')), timeoutMs: Number(getOption(args, '--timeout-ms', '180000'))
+            });
+            out(result);
+            if (result.status !== 'complete')
+                process.exitCode = result.status === 'paused' ? 2 : 1;
+            return;
+        }
         case 'doctor': {
             let stage = 'not started';
             try {
                 stage = (await getStatus(root)).currentStage;
             }
             catch { }
-            out({ node: process.version, project: root, stage, skills: ['codex', 'claude', 'cursor'], execution: 'local CLI; no direct LLM invocation', hostSmoketest: 'not executed' });
+            out({ node: process.version, project: root, stage, skills: ['codex', 'claude', 'cursor'], execution: 'local Agent subprocess invocation supported, requires installed and authenticated CLI', hostSmoketest: 'not executed in build environment' });
             return;
         }
         default: throw new Error(`Unknown command: ${command}\n${help}`);

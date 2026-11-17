@@ -7,6 +7,10 @@ description: Use when the user describes a new software project, feature or bugf
 
 Use this Skill for the `start` workflow. Start by reading `.ai-engineering/prompts/core/system.md` and `aek status`, then load only the relevant phase Prompt.
 
+## V0.2 subprocess support
+
+If the user launches this skill interactively *inside* Codex / Claude Code / Cursor, use stage prompts and `aek` gates directly; avoid recursively starting the same Agent CLI with `aek drive`. When the user launches AEK from an **external terminal**, `aek drive --agent codex --reviewer claude --allow-agent-exec --allow-writes --allow-tests --auto-commit` is the resumable single-command workflow. Running agents, tests or Git auto-commit requires explicit authorization and a feature branch.
+
 ## Actions
 
 Begin with `aek status` in the project. If no run exists: `aek init --kind greenfield|feature`, `aek install <current-agent>`, then `aek start "user requirement"`. Explain the first necessary question, load `ai-requirements`, and continue to the P1 deliverable. Never overwrite existing repository rules.

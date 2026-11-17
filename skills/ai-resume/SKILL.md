@@ -7,6 +7,10 @@ description: Use when resuming interrupted agent implementation, restoring stage
 
 Use this Skill for the `resume` workflow. Start by reading `.ai-engineering/prompts/core/system.md` and `aek status`, then load only the relevant phase Prompt.
 
+## V0.2 external CLI driver
+
+If running from an external terminal, use the same `aek drive --agent ... --reviewer ...` command to continue the saved state. In an interactive Agent host, operate the next stage directly with the existing Skill to avoid launching a recursive Agent process. Never skip an unanswered human decision.
+
 ## Actions
 
 Run `aek resume` and read the listed stage Prompt and existing approved docs. If stale changes were detected, return to affected phase. Continue, do not start a second run or ask already answered questions. STOP if the previous decision or evidence is untrustworthy.

@@ -251,3 +251,19 @@ test('init refuses symlinked internal project directory to prevent writing outsi
  await assert.rejects(initProject(root,{}),/symlink|unsafe/i);
  await assert.rejects(readFile(join(external,'config.json'),'utf8'));
 });
+
+
+test('a second successful verification supersedes a first failure on the same source commit',async()=>{
+ const root=await tmp();await initProject(root,{});await createGit(root);await startRun(root,'Retry check');
+ await writeFile(join(root,'docs/01-requirements/analysis.md'),'analysis');await advance(root);
+ await writeFile(join(root,'docs/01-requirements/spec.md'),sampleSpec);await advance(root);
+ await writeFile(join(root,'docs/03-architecture/design.md'),'design');await advance(root);
+ const cmd=['node','-e',"process.exit(require('node:fs').existsSync('.ai-engineering/transient-error')?7:0)"];
+ await setContract(root,{...contract,verification:{commands:[cmd]}});await advance(root);
+ await commitApprovedDocsAndImplementation(root);await advance(root);
+ await writeFile(join(root,'.ai-engineering/transient-error'),'temporary outage');
+ assert.equal((await verifyTasks(root,{allowExec:true})).passed,false);
+ await (await import('node:fs/promises')).rm(join(root,'.ai-engineering/transient-error'));
+ assert.equal((await verifyTasks(root,{allowExec:true})).passed,true);
+ await advance(root); assert.equal((await getStatus(root)).currentStage,'review');
+});

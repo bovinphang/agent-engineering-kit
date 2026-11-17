@@ -1,3 +1,5 @@
+> V0.2 users: for executable end-to-end `drive` and live host validation, see [V0.2 host guide](v0.2-live-agent-acceptance.md). The manual stage workflow below remains supported.
+
 # MVP 实战操作指南（Node.js 22 / PowerShell / Linux）
 
 ## 1. 安装前检查
@@ -7,7 +9,7 @@ node --version   # >= v22
 git --version
 ```
 
-解压 `agent-engineering-kit-v0.1.0.zip` 到如 `D:\tools\agent-engineering-kit`。无需 npm Registry 即可直接运行编译后的 JS。后续命令的 `AEK` 变量也可替换为你实际的解压路径。
+解压 `agent-engineering-kit-v0.2.0.zip` 到如 `D:\tools\agent-engineering-kit`。无需 npm Registry 即可直接运行编译后的 JS。后续命令的 `AEK` 变量也可替换为你实际的解压路径。
 
 ## 2. Windows PowerShell：已有企业邮箱项目（推荐试点）
 

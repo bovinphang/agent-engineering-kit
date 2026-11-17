@@ -1,13 +1,13 @@
 {
   "name": "agent-engineering-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Evidence-driven, cross-agent AI-native software engineering workflow toolkit",
   "license": "MIT",
   "engines": {"node": ">=22"},
   "bin": {"ai-engineering": "./bin/ai-engineering.mjs", "aek": "./bin/ai-engineering.mjs"},
-  "files": ["bin", "dist", "skills", "prompts", "templates", "schemas", "profiles", "docs/09-delivery", "docs/07-verification", "README.md", "README.zh-CN.md", "CHANGELOG.md"],
+  "files": ["bin", "dist", "skills", "prompts", "templates", "schemas", "profiles", "docs", "README.md", "README.zh-CN.md", "CHANGELOG.md"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",

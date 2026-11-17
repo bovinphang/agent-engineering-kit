@@ -39,7 +39,7 @@ export async function initProject(root:string,options:{dryRun?:boolean;kind?:str
     const secret=pathOf(base,'.ai-engineering/.evidence-key');
     if(!await exists(secret))await writeFile(secret,randomBytes(32),{mode:0o600,flag:'wx'});
     const ignore=pathOf(base,'.ai-engineering/.gitignore');
-    if(!await exists(ignore))await writeFile(ignore,'state.json\nevents.ndjson\nevidence/\n.evidence-key\n.lock\n');
+    if(!await exists(ignore))await writeFile(ignore,'state.json\nevents.ndjson\nevidence/\nagent-runs/\n.evidence-key\n.lock\n');
   }
   return {actions,conflicts:[]};
 }
@@ -179,7 +179,7 @@ async function checkVerification(root:string,s:State):Promise<void>{
   for(const task of tasks){
     const matching=s.evidence.filter(e=>e.taskId===task.id && isAncestor(root,e.commitSha) && e.sourceTreeHash===codeHash && e.worktreeHash===tree && e.contractHash===sha256(JSON.stringify(task)) && e.specHash===specHash);
     for(const command of task.verification.commands){
-      const cmd=matching.find(e=>JSON.stringify(e.command)===JSON.stringify(command));
+      const cmd=[...matching].reverse().find(e=>JSON.stringify(e.command)===JSON.stringify(command));
       if(!cmd||!await validEvidence(root,cmd))throw new Error(`Verification evidence missing, stale, or signature invalid for ${task.id}: ${command.join(' ')}`);
       const actualLog=await readTextOrEmpty(pathOf(root,cmd.logPath));
       if(sha256(actualLog)!==cmd.outputHash)throw new Error(`Verification evidence log modified for ${task.id}`);

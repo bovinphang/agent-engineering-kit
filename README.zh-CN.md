@@ -1,8 +1,25 @@
 # Agent Engineering Kit (AEK) — AI 原生软件研发工程插件
 
-> V0.1.0 先行 MVP（源代码与本地 CLI 已实现、自动测试已建立）。**没有直接运行任何 Codex/Claude/Cursor 宿主会话进行人工或模型端真实冒烟**，因此不应将“安装目录已验证”宣传为“三平台端到端闭环已通过”。
+> V0.2.0 先行集成版本（源代码与本地 CLI 已实现、自动测试已建立）。**仍未在真实 Codex/Claude/Cursor 宿主完成模型端冒烟**，因此不应将“安装目录已验证”宣传为“三平台端到端闭环已通过”。
 
 [English](README.md) · [快速上手](docs/09-delivery/quickstart.md) · [兼容性矩阵](docs/09-delivery/compatibility.md) · [安全边界](docs/07-verification/security-model.md)
+
+
+## V0.2 新增：CLI Agent 自动驱动
+
+V0.2 已实现三款 Agent CLI 的**真实进程启动代码和协议解析器**，以及可恢复的 `drive` 调度。请先通过 `agent-check` 确认自己电脑上真的安装并登录了 CLI（在本次构建环境三款 CLI 都不可用，不能宣称真实模型端验证通过）。
+
+```powershell
+node .\bin\ai-engineering.mjs agent-check codex
+node .\bin\ai-engineering.mjs agent-check claude
+node .\bin\ai-engineering.mjs agent-check cursor
+# 先 init/install/start，在独立 Git 功能分支运行：
+node .\bin\ai-engineering.mjs drive --agent codex --reviewer claude --project D:\code\demo --allow-agent-exec --allow-writes --allow-tests --auto-commit --max-fix-attempts 2
+```
+
+遇到关键业务疑问将返回 `paused`；通过 `aek questions` / `aek answer` 回答后重新执行同一 `drive`，不会要求每个阶段再输入长提示词。测试失败最多触发默认 2 次 Agent 自动修复，每次均重新提交并执行测试；审查由新 CLI 进程进入临时 worktree 执行。**写入与测试必须显式授权，主分支禁止自动提交，生产发布不会自动进行。**
+
+[真实宿主验收指南](docs/09-delivery/v0.2-live-agent-acceptance.md) · [V0.2 架构及限制](docs/03-architecture/v0.2-agent-runtime.md) · [本地验证报告](docs/09-delivery/v0.2-verification-report.md)
 
 ## 核心特点
 
@@ -88,14 +105,14 @@ npm run check                      # 全量本地门禁
 
 ## 安全 / 能力边界
 
-1. 本项目不自行调用任何 LLM，也不会在 CLI 内自动实现真实业务逻辑。**自动化问答、编码和审查内容必须由宿主 Agent 执行**；CLI 只管理项目协议和客观门禁。
+1. V0.2 通过用户本机已安装且认证的 Agent CLI **实际发起模型调用**，但自身不托管模型、没有内置商业模型权限，也不保证模型生成内容正确。阶段生成和审查由宿主 Agent 完成；`aek` 负责确定性流程与门禁。
 2. 本地 HMAC 对证据文件的保护只能抵抗意外或无密钥的手工篡改，不能作为恶意 Agent 获得本机读权限后的可信证明。银行等高风险场景应使用受保护的 CI、人工审批和外部 Reviewer。
 3. Reviewer 的不同身份/上下文仅作为记录导入时的结构校验，不是对独立身份的不可抵赖验证。
-4. 默认执行任何实际验证命令都需要显式 `--allow-exec`，不自动联网/发布生产。Runner 不使用 shell 字符串，但契约中的可执行程序仍可能产生副作用，执行前必须审查。
+4. 任务验证命令需要显式 `--allow-exec`（或 `drive --allow-tests`），Agent 模型调用需要 `--allow-agent-exec`，写入还需 `--allow-writes`，不自动联网/发布生产。Runner 不使用 shell 字符串，但契约中的可执行程序仍可能产生副作用，执行前必须审查。
 5. 新增功能的文档与实现需在 P6 之前提交 Git；P8/P9 交付记录与源码测试证据分别追踪，避免误失效。
 
 ## 发展计划
 
-V0.2：版本化 Git worktree 调度、可信 CI Gate/Reviewer 集成、完整 Prompt/Skill 压力场景实测、差异预览 UI、跨平台真实宿主演练。V0.3：其他 Agent Adapters、NPM 分发、企业审批、MCP / 可视化平台。
+V0.2 当前已实现单任务 CLI 编排、临时 worktree Reviewer 与有界自动修复；尚缺真实模型宿主测试与可信 CI Gate。V0.3：其他 Agent Adapters、NPM 分发、企业审批、MCP / 可视化平台。
 
 现阶段请按 `docs/09-delivery/compatibility.md` 的实测级别评估，**不要据此认为全部 14 种工具已经兼容。**

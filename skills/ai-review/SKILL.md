@@ -9,7 +9,7 @@ Use this Skill for the `review` workflow. Start by reading `.ai-engineering/prom
 
 ## Actions
 
-Read `.ai-engineering/prompts/stages/07-review.md`; use a new reviewer session and a separate actor identity. Prepare review.json with real diff findings. Import using `aek review path/to/review.json`, then `aek advance`. A self-review must not be passed off as independent.
+Read `.ai-engineering/prompts/stages/07-review.md`; use a new reviewer session and a separate actor identity. When invoked from an external terminal, prefer `aek agent-review claude --allow-agent-exec` (or another installed independent Agent) to create a new subprocess and temporary worktree. Otherwise prepare review.json with real diff findings from a genuinely separate reviewer session and import using `aek review path/to/review.json`, then `aek advance`. A self-review must not be passed off as independent.
 
 ## Guardrails / Blockers
 
