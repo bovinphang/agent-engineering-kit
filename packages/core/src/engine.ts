@@ -21,6 +21,15 @@ export async function initProject(root:string,options:{dryRun?:boolean;kind?:str
   if(options.risk&&!['basic','standard','regulated'].includes(options.risk))throw new Error(`Unsupported risk profile: ${options.risk}`);
   if(options.kind&&!['greenfield','feature'].includes(options.kind))throw new Error(`Unsupported project kind: ${options.kind}`);
   const base=resolve(root);const actions:string[]=[];
+  // Existing nested symlinks are never a safe place to initialize project-owned assets.
+  for(const rel of [...PROJECT_DIRS,CONFIG,'.ai-engineering/.evidence-key']){
+    let current=base;
+    for(const part of rel.split('/')){
+      current=join(current,part);
+      try {if((await lstat(current)).isSymbolicLink())throw new Error(`Unsafe symlink in initialization path: ${rel}`);}
+      catch(err){if((err as NodeJS.ErrnoException).code!=='ENOENT')throw err;}
+    }
+  }
   const cfg=pathOf(base,CONFIG);
   for (const d of PROJECT_DIRS)if(!await exists(pathOf(base,d)))actions.push(`mkdir ${d}`);
   if(!await exists(cfg))actions.push(`create ${CONFIG}`);

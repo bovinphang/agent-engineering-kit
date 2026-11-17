@@ -243,3 +243,11 @@ test('installer refuses symlinked skill target directories',async()=>{
  const external=await tmp();await symlink(external,join(root,'.agents/skills'),'dir');
  await assert.rejects(installAgent(root,'codex',{}),/symlink/);
 });
+
+test('init refuses symlinked internal project directory to prevent writing outside repo',async()=>{
+ const root=await tmp();const external=await tmp();
+ const {symlink}=await import('node:fs/promises');
+ await symlink(external,join(root,'.ai-engineering'),'dir');
+ await assert.rejects(initProject(root,{}),/symlink|unsafe/i);
+ await assert.rejects(readFile(join(external,'config.json'),'utf8'));
+});

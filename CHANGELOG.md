@@ -8,4 +8,4 @@
 - Git-bound local verification, detached logs, HMAC signatures, stale detection, and review records.
 - Codex, Claude Code, Cursor Skill/Rule installers with dry-run, conflict preservation and safe uninstall.
 - 12 Agent Skills, nine stage prompts, reference templates, CI starter and bilingual quick starts.
-- 21 local Node unit/integration/E2E tests; target-host live model tests pending.
+- 22 local Node unit/integration/E2E tests; target-host live model tests pending.

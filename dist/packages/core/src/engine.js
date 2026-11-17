@@ -1,7 +1,7 @@
 import { appendFile, mkdir, readFile, writeFile, lstat, readlink } from 'node:fs/promises';
 import { execFileSync, spawn } from 'node:child_process';
 import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
-import { basename, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { exists, listJsonFiles, now, pathOf, readJson, readTextOrEmpty, sha256, withLock, writeAtomic } from './io.js';
 import { auditPaths, validateContracts, validateSpec } from './validation.js';
 export const STAGES = ['requirements', 'spec', 'design', 'plan', 'implement', 'verify', 'review', 'deliver', 'learn'];
@@ -17,6 +17,21 @@ export async function initProject(root, options = {}) {
         throw new Error(`Unsupported project kind: ${options.kind}`);
     const base = resolve(root);
     const actions = [];
+    // Existing nested symlinks are never a safe place to initialize project-owned assets.
+    for (const rel of [...PROJECT_DIRS, CONFIG, '.ai-engineering/.evidence-key']) {
+        let current = base;
+        for (const part of rel.split('/')) {
+            current = join(current, part);
+            try {
+                if ((await lstat(current)).isSymbolicLink())
+                    throw new Error(`Unsafe symlink in initialization path: ${rel}`);
+            }
+            catch (err) {
+                if (err.code !== 'ENOENT')
+                    throw err;
+            }
+        }
+    }
     const cfg = pathOf(base, CONFIG);
     for (const d of PROJECT_DIRS)
         if (!await exists(pathOf(base, d)))
